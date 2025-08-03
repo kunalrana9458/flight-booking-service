@@ -31,6 +31,22 @@ async function createBooking(data) {
         throw error
     }
 }
+
+async function makePayment(data){
+    const transaction = await db.sequelize.transaction()
+    try {
+        const bookingDetails = await bookingRepository.get(data.bookingId,transaction)
+        if(bookingDetails.totalCost !== data.totalCost){
+            throw new AppError('The amount of the payment doesnt match',StatusCodes.BAD_REQUEST)
+        }
+        if(bookingDetails.userId !== data.userId){
+            throw new AppError('The user corresponding to the booking doesnt match',StatusCodes.BAD_REQUEST)
+        }
+        // we assume here that payment is successful
+    } catch (error) {
+        
+    }
+}
  
 module.exports = {
   createBooking,
