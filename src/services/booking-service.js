@@ -39,6 +39,16 @@ async function makePayment(data){
     const transaction = await db.sequelize.transaction()
     try {
         const bookingDetails = await bookingRepository.get(data.bookingId,transaction)
+        if(bookingDetails.status == CANCELLED){
+            throw new AppError('The booking has expired',StatusCodes.BAD_REQUEST)
+        }
+        // logic to check booking is done in the particular timeframe e.g. 20 minutes
+        const bookingTime = new Date(bookingDetails.createdAt)
+        const currentTime = new Date()
+        if(currentTime-bookingTime > 30000){
+            await bookingRepository.update(data.bookingId,{status:CANCELLED},transaction)
+            throw new AppError('The Booking has Expired',StatusCodes.BAD_REQUEST)
+        }
         if(bookingDetails.totalCost !== data.totalCost){
             throw new AppError('The amount of the payment doesnt match',StatusCodes.BAD_REQUEST)
         }
