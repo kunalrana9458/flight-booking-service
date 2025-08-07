@@ -15,4 +15,9 @@ router.post(
     BookingController.makePayment
 )
 
+router.get(
+    '/user-history',
+    BookingController.userBookingHistory
+)
+
 module.exports = router

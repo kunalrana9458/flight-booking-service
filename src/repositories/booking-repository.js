@@ -2,7 +2,7 @@ const {StatusCodes} = require('http-status-codes')
 const {Booking} = require('../models')
 const CrudRepository = require('./crud-repository')
 const AppError = require('../utils/errors/app-error')
-const {  Op } = require('sequelize')
+const {  Op, where } = require('sequelize')
 const {Enums} = require('../utils/common')
 const {CANCELLED,PENDING,INITIATED,BOOKED} = Enums.BOOKING_STATUS
 
@@ -30,6 +30,15 @@ class BookingRepository extends CrudRepository {
                 id:id
             }
         },{transaction:transaction})
+        return response
+    }
+
+    async userBookingHistory(userId){
+        const response = await Booking.findAll({
+            where:{
+                userId:userId
+            }
+        })
         return response
     }
 

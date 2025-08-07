@@ -57,8 +57,23 @@ async function makePayment(req,res){
     }
 }
 
+async function userBookingHistory(req,res){
+    try {
+        const userId = req.body.userId
+        const result = await BookingService.userBookingHistory(userId)
+        SuccessResponse.data = result
+        return res
+                 .status(StatusCodes.OK)
+                 .json(SuccessResponse)
+    } catch (error) {
+        return res
+                 .status(error.statusCode)
+                 .json(ErrorResponse)
+    }
+}
 
 module.exports = {
     createBooking,
-    makePayment
+    makePayment,
+    userBookingHistory
 }

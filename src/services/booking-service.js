@@ -8,7 +8,7 @@ const { StatusCodes } = require("http-status-codes");
 const AppError = require("../utils/errors/app-error");
 
 const {Enums} = require('../utils/common')
-const {INITIATED,CANCELLED,BOOKED,PENDING} = Enums.BOOKING_STATUS
+const {CANCELLED,BOOKED} = Enums.BOOKING_STATUS
 
 const bookingRepository = new BookingRepository()
 
@@ -65,6 +65,15 @@ async function makePayment(data){
     }
 }
 
+async function userBookingHistory(userId){
+    try {
+        const response = await bookingRepository.userBookingHistory(userId)
+        return response
+    } catch (error) {
+        throw error
+    }
+}
+
 async function cancelBooking(bookingId){
     const transaction = await db.sequelize.transaction()
     try {
@@ -100,5 +109,6 @@ module.exports = {
   createBooking,
   makePayment,
   cancelBooking,
-  cancelOldBooking
+  cancelOldBooking,
+  userBookingHistory
 };
