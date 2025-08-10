@@ -6,7 +6,7 @@ const { ServerConfig } = require("../config");
 const db = require("../models");
 const { StatusCodes } = require("http-status-codes");
 const AppError = require("../utils/errors/app-error");
-
+const CacheService = require('./cache-service')
 const {Enums} = require('../utils/common')
 const {CANCELLED,BOOKED} = Enums.BOOKING_STATUS
 
@@ -67,7 +67,16 @@ async function makePayment(data){
 
 async function userBookingHistory(userId){
     try {
+        const cacheKey = `bookingHistory:${userId}`
+        // check that entry is present in the cache or not
+        let bookings = await CacheService.get(cacheKey)
+        if(bookings){
+            console.log('Fetched from the Redis Cache')
+            return bookings
+        }
         const response = await bookingRepository.userBookingHistory(userId)
+        // store in redis for next time
+        await CacheService.set(cacheKey,response,300) // cache for 5 min
         return response
     } catch (error) {
         throw error
